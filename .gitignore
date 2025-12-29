@@ -1,6 +1,9 @@
 # Specs (internal planning, not for public)
 spec/
 
+# Claude Code instructions (local only)
+CLAUDE.md
+
 # Dependencies
 node_modules/
 .pnp
