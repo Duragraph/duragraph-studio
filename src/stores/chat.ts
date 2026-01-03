@@ -29,9 +29,10 @@ export const useChatStore = create<ChatState>((set) => ({
   isStreaming: false,
   setSelectedThreadId: (id) => set({ selectedThreadId: id }),
   setSelectedAssistantId: (id) => set({ selectedAssistantId: id }),
-  addMessage: (message) => set((state) => ({
-    messages: [...state.messages, message],
-  })),
+  addMessage: (message) =>
+    set((state) => ({
+      messages: [...state.messages, message],
+    })),
   setIsStreaming: (streaming) => set({ isStreaming: streaming }),
   clearMessages: () => set({ messages: [] }),
 }))

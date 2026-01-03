@@ -122,22 +122,32 @@
   }
 
   /* Geometric sans for headings */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     @apply tracking-tight font-semibold;
   }
 
   /* Monospace for technical elements */
-  code, pre, .font-mono {
+  code,
+  pre,
+  .font-mono {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
   }
 
   /* Zero radius - engineered precision */
-  button, [role="button"] {
+  button,
+  [role='button'] {
     border-radius: 0 !important;
   }
 
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     border-radius: 0 !important;
   }
   :root {

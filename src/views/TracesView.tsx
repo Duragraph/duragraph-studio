@@ -14,33 +14,35 @@ export function TracesView() {
   const { events, isConnected } = useRunStream(selectedRunId || null)
 
   // Process events to build execution trace
-  const executionSteps = events.filter(event => 
-    event.type.includes('node.') || event.type.includes('run.')
-  ).map(event => {
-    if (event.type.startsWith('node.')) {
-      const nodeEvent = event.data as NodeExecutionEvent
-      return {
-        id: event.timestamp + nodeEvent.node_id,
-        type: 'node',
-        nodeId: nodeEvent.node_id,
-        status: nodeEvent.status,
-        input: nodeEvent.input,
-        output: nodeEvent.output,
-        error: nodeEvent.error,
-        timestamp: event.timestamp,
+  const executionSteps = events
+    .filter((event) => event.type.includes('node.') || event.type.includes('run.'))
+    .map((event) => {
+      if (event.type.startsWith('node.')) {
+        const nodeEvent = event.data as NodeExecutionEvent
+        return {
+          id: event.timestamp + nodeEvent.node_id,
+          type: 'node',
+          nodeId: nodeEvent.node_id,
+          status: nodeEvent.status,
+          input: nodeEvent.input,
+          output: nodeEvent.output,
+          error: nodeEvent.error,
+          timestamp: event.timestamp,
+        }
+      } else {
+        return {
+          id: event.timestamp,
+          type: 'run',
+          status: event.type.split('.')[1],
+          data: event.data,
+          timestamp: event.timestamp,
+        }
       }
-    } else {
-      return {
-        id: event.timestamp,
-        type: 'run',
-        status: event.type.split('.')[1],
-        data: event.data,
-        timestamp: event.timestamp,
-      }
-    }
-  })
+    })
 
-  const selectedRun = runs?.find((run: any) => run.run_id === selectedRunId)
+  const selectedRun = runs?.find(
+    (run: { run_id: string }) => run.run_id === selectedRunId
+  )
 
   return (
     <div className="flex h-full">
@@ -55,7 +57,15 @@ export function TracesView() {
               </div>
             ) : runs?.length ? (
               <div className="space-y-2">
-                {runs.slice(0, 20).map((run: any) => (
+                {runs
+                  .slice(0, 20)
+                  .map(
+                    (run: {
+                      run_id: string
+                      status: string
+                      created_at: string
+                      completed_at?: string
+                    }) => (
                   <Card
                     key={run.run_id}
                     className={`cursor-pointer transition-colors hover:bg-muted ${
@@ -65,17 +75,22 @@ export function TracesView() {
                   >
                     <CardContent className="p-3">
                       <div className="flex items-center justify-between mb-2">
-                        <Badge variant={run.status === 'completed' ? 'default' : 
-                                     run.status === 'failed' ? 'destructive' : 'secondary'}>
+                        <Badge
+                          variant={
+                            run.status === 'completed'
+                              ? 'default'
+                              : run.status === 'failed'
+                                ? 'destructive'
+                                : 'secondary'
+                          }
+                        >
                           {run.status}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
                           {formatDuration(run.created_at, run.completed_at)}
                         </span>
                       </div>
-                      <p className="text-sm font-mono truncate">
-                        {run.run_id.slice(0, 12)}...
-                      </p>
+                      <p className="text-sm font-mono truncate">{run.run_id.slice(0, 12)}...</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {formatDate(run.created_at)}
                       </p>
@@ -94,9 +109,7 @@ export function TracesView() {
                 <Badge variant={isConnected ? 'default' : 'secondary'}>
                   {isConnected ? 'Live' : 'Static'}
                 </Badge>
-                <span className="text-sm text-muted-foreground">
-                  {events.length} events
-                </span>
+                <span className="text-sm text-muted-foreground">{events.length} events</span>
               </div>
             </div>
           )}
@@ -112,8 +125,15 @@ export function TracesView() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Run Details</CardTitle>
-                  <Badge variant={selectedRun.status === 'completed' ? 'default' : 
-                               selectedRun.status === 'failed' ? 'destructive' : 'secondary'}>
+                  <Badge
+                    variant={
+                      selectedRun.status === 'completed'
+                        ? 'default'
+                        : selectedRun.status === 'failed'
+                          ? 'destructive'
+                          : 'secondary'
+                    }
+                  >
                     {selectedRun.status}
                   </Badge>
                 </div>
@@ -138,7 +158,9 @@ export function TracesView() {
                   </div>
                   <div>
                     <p className="text-sm font-medium">Created</p>
-                    <p className="text-sm text-muted-foreground">{formatDate(selectedRun.created_at)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(selectedRun.created_at)}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -157,9 +179,11 @@ export function TracesView() {
                         <div key={step.id} className="flex items-start gap-4">
                           {/* Timeline connector */}
                           <div className="flex flex-col items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              step.type === 'run' ? 'bg-primary' : 'bg-secondary'
-                            }`}>
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                step.type === 'run' ? 'bg-primary' : 'bg-secondary'
+                              }`}
+                            >
                               {step.type === 'node' && step.nodeId ? (
                                 // Try to infer node type from nodeId or use generic icon
                                 <Brain className="h-4 w-4 text-primary-foreground" />
@@ -176,11 +200,11 @@ export function TracesView() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <p className="text-sm font-medium">
-                                {step.type === 'node' ? `Node: ${step.nodeId}` : `Run ${step.status}`}
+                                {step.type === 'node'
+                                  ? `Node: ${step.nodeId}`
+                                  : `Run ${step.status}`}
                               </p>
-                              <Badge variant="outline">
-                                {step.status}
-                              </Badge>
+                              <Badge variant="outline">{step.status}</Badge>
                               <span className="text-xs text-muted-foreground">
                                 {formatDate(step.timestamp)}
                               </span>
@@ -239,9 +263,7 @@ export function TracesView() {
             <div className="text-center text-muted-foreground">
               <Activity className="h-16 w-16 mx-auto mb-4 opacity-50" />
               <p className="text-lg">Select a run to view its execution trace</p>
-              <p className="text-sm mt-2">
-                See how your AI agents think and execute step by step
-              </p>
+              <p className="text-sm mt-2">See how your AI agents think and execute step by step</p>
             </div>
           </div>
         )}

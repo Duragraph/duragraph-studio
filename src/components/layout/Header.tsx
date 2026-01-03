@@ -10,7 +10,7 @@ const navigation = [
 
 export function Header() {
   const location = useLocation()
-  
+
   return (
     <header className="border-b border-border bg-background px-6 py-4">
       <div className="flex items-center justify-between">
@@ -25,9 +25,7 @@ export function Header() {
                   to={item.href}
                   className={cn(
                     'flex items-center gap-2 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
+                    isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   <item.icon className="h-4 w-4" />

@@ -13,7 +13,7 @@ export class ApiError extends Error {
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const url = `${API_BASE}/api/v1${endpoint}`
-  
+
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -40,6 +40,5 @@ export const api = {
     fetchWithAuth(url, { method: 'POST', body: JSON.stringify(data) }),
   patch: (url: string, data: unknown) =>
     fetchWithAuth(url, { method: 'PATCH', body: JSON.stringify(data) }),
-  delete: (url: string) =>
-    fetchWithAuth(url, { method: 'DELETE' }),
+  delete: (url: string) => fetchWithAuth(url, { method: 'DELETE' }),
 }

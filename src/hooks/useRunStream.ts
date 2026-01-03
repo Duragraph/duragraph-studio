@@ -24,7 +24,7 @@ export function useRunStream(runId: string | null) {
         setError(null)
       },
       onMessage: (event) => {
-        setEvents(prev => [...prev, event])
+        setEvents((prev) => [...prev, event])
 
         // Invalidate run query on status changes
         if (event.type.startsWith('run.')) {

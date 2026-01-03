@@ -60,6 +60,6 @@ export class SSEClient {
 export function createRunStream(runId: string, options: SSEOptions = {}) {
   const API_BASE = import.meta.env.VITE_DURAGRAPH_API_URL || 'http://localhost:8081'
   const url = `${API_BASE}/api/v1/stream?run_id=${runId}`
-  
+
   return new SSEClient(url, options)
 }

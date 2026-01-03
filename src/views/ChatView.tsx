@@ -13,8 +13,15 @@ import { formatDate } from '@/lib/utils'
 export function ChatView() {
   const [message, setMessage] = useState('')
   const [currentRunId, setCurrentRunId] = useState<string | null>(null)
-  
-  const { selectedThreadId, selectedAssistantId, messages, addMessage, isStreaming, setIsStreaming } = useChatStore()
+
+  const {
+    selectedThreadId,
+    selectedAssistantId,
+    messages,
+    addMessage,
+    isStreaming,
+    setIsStreaming,
+  } = useChatStore()
   const createRun = useCreateRun()
   const { events, isConnected } = useRunStream(currentRunId)
 
@@ -42,7 +49,7 @@ export function ChatView() {
       })
 
       setCurrentRunId(run.run_id)
-      
+
       // Add a placeholder assistant message that will be updated via SSE
       addMessage({
         id: run.run_id,
@@ -50,7 +57,6 @@ export function ChatView() {
         content: '',
         timestamp: new Date().toISOString(),
       })
-
     } catch (error) {
       console.error('Failed to create run:', error)
       setIsStreaming(false)
@@ -66,8 +72,8 @@ export function ChatView() {
       setIsStreaming(false)
       // Update the assistant message with final output
       if (lastEvent.data && typeof lastEvent.data === 'object' && 'output' in lastEvent.data) {
-        const output = lastEvent.data.output as any
-        if (output?.content) {
+        const output = lastEvent.data.output as Record<string, unknown>
+        if (output?.content && typeof output.content === 'string') {
           // Find and update the assistant message
           // This is a simple approach - in production you'd want more robust state management
         }
@@ -84,16 +90,14 @@ export function ChatView() {
       // Handle streaming output chunks
       // This would append to the current assistant message
     }
-  }, [events])
+  }, [events, addMessage, setIsStreaming])
 
   if (!selectedThreadId || !selectedAssistantId) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center text-muted-foreground">
           <p className="text-lg">Welcome to DuraGraph Studio</p>
-          <p className="mt-2 text-sm">
-            Select a thread and assistant to start a conversation
-          </p>
+          <p className="mt-2 text-sm">Select a thread and assistant to start a conversation</p>
         </div>
       </div>
     )
@@ -124,15 +128,11 @@ export function ChatView() {
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex ${
-                msg.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                  msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
+                  msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                 }`}
               >
                 {msg.role === 'assistant' ? (
@@ -142,9 +142,7 @@ export function ChatView() {
                 ) : (
                   <p>{msg.content}</p>
                 )}
-                <p className="mt-1 text-xs opacity-70">
-                  {formatDate(msg.timestamp)}
-                </p>
+                <p className="mt-1 text-xs opacity-70">{formatDate(msg.timestamp)}</p>
               </div>
             </div>
           ))}

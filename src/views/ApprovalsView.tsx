@@ -12,12 +12,12 @@ import type { Run } from '@/types/entities'
 export function ApprovalsView() {
   const { data: runs, isLoading } = useRuns()
   const [toolOutputs, setToolOutputs] = useState<Record<string, string>>({})
-  
+
   // Filter runs that require action
   const pendingRuns = runs?.filter((run: Run) => run.status === 'requires_action') || []
 
   const handleToolOutput = (runId: string, toolCallId: string, output: string) => {
-    setToolOutputs(prev => ({
+    setToolOutputs((prev) => ({
       ...prev,
       [`${runId}:${toolCallId}`]: output,
     }))
@@ -36,16 +36,16 @@ export function ApprovalsView() {
     const handleSubmit = async () => {
       setIsSubmitting(true)
       try {
-        const outputs = toolCalls.map(toolCall => ({
+        const outputs = toolCalls.map((toolCall) => ({
           tool_call_id: toolCall.id,
           output: toolOutputs[`${run.run_id}:${toolCall.id}`] || '',
         }))
 
         await submitToolOutputs.mutateAsync(outputs)
-        
+
         // Clear the form
-        toolCalls.forEach(toolCall => {
-          setToolOutputs(prev => {
+        toolCalls.forEach((toolCall) => {
+          setToolOutputs((prev) => {
             const newOutputs = { ...prev }
             delete newOutputs[`${run.run_id}:${toolCall.id}`]
             return newOutputs
@@ -58,8 +58,8 @@ export function ApprovalsView() {
       }
     }
 
-    const allOutputsProvided = toolCalls.every(
-      toolCall => toolOutputs[`${run.run_id}:${toolCall.id}`]?.trim()
+    const allOutputsProvided = toolCalls.every((toolCall) =>
+      toolOutputs[`${run.run_id}:${toolCall.id}`]?.trim()
     )
 
     return (
@@ -74,10 +74,10 @@ export function ApprovalsView() {
         {toolCalls.map((toolCall) => {
           const outputKey = `${run.run_id}:${toolCall.id}`
           let parsedArgs = {}
-          
+
           try {
             parsedArgs = JSON.parse(toolCall.function.arguments)
-          } catch (e) {
+          } catch {
             // Ignore parsing errors
           }
 
@@ -96,11 +96,9 @@ export function ApprovalsView() {
                     {JSON.stringify(parsedArgs, null, 2)}
                   </pre>
                 </div>
-                
+
                 <div>
-                  <label className="text-sm font-medium">
-                    Provide output for this tool call:
-                  </label>
+                  <label className="text-sm font-medium">Provide output for this tool call:</label>
                   <Textarea
                     placeholder="Enter the result of this function call..."
                     value={toolOutputs[outputKey] || ''}
@@ -184,9 +182,7 @@ export function ApprovalsView() {
         <div className="text-center text-muted-foreground py-12">
           <CheckCircle className="h-16 w-16 mx-auto mb-4 opacity-50" />
           <p className="text-lg">No pending approvals</p>
-          <p className="text-sm mt-2">
-            All runs are executing normally without human intervention
-          </p>
+          <p className="text-sm mt-2">All runs are executing normally without human intervention</p>
         </div>
       )}
     </div>

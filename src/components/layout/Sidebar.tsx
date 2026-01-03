@@ -2,22 +2,32 @@ import { useThreads } from '@/api/threads'
 import { useAssistants } from '@/api/assistants'
 import { useChatStore } from '@/stores/chat'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Plus } from 'lucide-react'
 import { useCreateThread } from '@/api/threads'
 
 export function Sidebar() {
-  const { selectedThreadId, selectedAssistantId, setSelectedThreadId, setSelectedAssistantId } = useChatStore()
+  const { selectedThreadId, selectedAssistantId, setSelectedThreadId, setSelectedAssistantId } =
+    useChatStore()
   const { data: threads, isLoading: threadsLoading } = useThreads()
   const { data: assistants, isLoading: assistantsLoading } = useAssistants()
   const createThread = useCreateThread()
 
   const handleCreateThread = () => {
-    createThread.mutate({}, {
-      onSuccess: (thread) => {
-        setSelectedThreadId(thread.thread_id)
+    createThread.mutate(
+      {},
+      {
+        onSuccess: (thread) => {
+          setSelectedThreadId(thread.thread_id)
+        },
       }
-    })
+    )
   }
 
   return (
@@ -42,15 +52,19 @@ export function Sidebar() {
             </SelectTrigger>
             <SelectContent>
               {threadsLoading ? (
-                <SelectItem value="loading" disabled>Loading...</SelectItem>
+                <SelectItem value="loading" disabled>
+                  Loading...
+                </SelectItem>
               ) : threads?.length ? (
-                threads.map((thread: any) => (
+                threads.map((thread: { thread_id: string }) => (
                   <SelectItem key={thread.thread_id} value={thread.thread_id}>
                     {thread.thread_id.slice(0, 8)}...
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="empty" disabled>No threads</SelectItem>
+                <SelectItem value="empty" disabled>
+                  No threads
+                </SelectItem>
               )}
             </SelectContent>
           </Select>
@@ -65,15 +79,19 @@ export function Sidebar() {
             </SelectTrigger>
             <SelectContent>
               {assistantsLoading ? (
-                <SelectItem value="loading" disabled>Loading...</SelectItem>
+                <SelectItem value="loading" disabled>
+                  Loading...
+                </SelectItem>
               ) : assistants?.length ? (
-                assistants.map((assistant: any) => (
+                assistants.map((assistant: { assistant_id: string; name: string }) => (
                   <SelectItem key={assistant.assistant_id} value={assistant.assistant_id}>
                     {assistant.name}
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="empty" disabled>No assistants</SelectItem>
+                <SelectItem value="empty" disabled>
+                  No assistants
+                </SelectItem>
               )}
             </SelectContent>
           </Select>
